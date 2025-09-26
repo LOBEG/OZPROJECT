@@ -19,7 +19,7 @@ export const handler = async (event, context) => {
 
   try {
     const data = JSON.parse(event.body);
-    const { code, redirect_uri, client_secret, code_verifier, state } = data;
+    const { code, redirect_uri, code_verifier, state } = data;
 
     if (!code) {
       return {
@@ -29,65 +29,39 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Microsoft OAuth credentials
-    const CLIENT_ID = 'd7a88881-f067-4c41-b2bc-1f0f6ec9d304';
-    // Use the redirect_uri from the request instead of hardcoded value
-    const REDIRECT_URI = redirect_uri || `${process.env.URL || 'http://localhost:3000'}/oauth-callback`;
-    const SCOPE = 'openid profile email User.Read offline_access';
-    const CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || client_secret;
-
-    // Build token request parameters - always include client_id
-    const tokenParams = {
-      client_id: CLIENT_ID,
-      scope: SCOPE,
-      code: code,
-      redirect_uri: REDIRECT_URI,
-      grant_type: 'authorization_code'
-    };
-
-    // Add authentication method
-    let authMethod;
-    if (code_verifier) {
-      authMethod = 'PKCE';
-      tokenParams.code_verifier = code_verifier;
-    } else if (CLIENT_SECRET) {
-      authMethod = 'client_secret';
-      tokenParams.client_secret = CLIENT_SECRET;
-    } else {
+    if (!code_verifier) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({
-          success: false,
-          error: 'Either code_verifier (PKCE) or client_secret is required for token exchange',
-          authorizationCode: code,
-          clientId: CLIENT_ID,
-          redirectUri: REDIRECT_URI,
-          scope: SCOPE,
-          tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-          instructions: {
-            pkce: 'Include code_verifier parameter for PKCE flow (recommended)',
-            clientSecret: 'Set MICROSOFT_CLIENT_SECRET environment variable for fallback',
-            note: 'PKCE method is preferred for security'
-          }
+        body: JSON.stringify({ 
+          error: 'PKCE code_verifier is required for public client authentication',
+          hint: 'This app is configured as a public client and must use PKCE flow'
         }),
       };
     }
 
-    // Convert to URLSearchParams and ensure client_id is first
+    // Microsoft OAuth credentials - PUBLIC CLIENT CONFIGURATION
+    const CLIENT_ID = 'd7a88881-f067-4c41-b2bc-1f0f6ec9d304';
+    const REDIRECT_URI = redirect_uri || `${process.env.URL || 'http://localhost:3000'}/oauth-callback`;
+    const SCOPE = 'openid profile email User.Read offline_access';
+
+    // Build token request parameters for PUBLIC CLIENT (PKCE only, no client_secret)
     const tokenRequestBody = new URLSearchParams();
     tokenRequestBody.append('client_id', CLIENT_ID);
     tokenRequestBody.append('grant_type', 'authorization_code');
     tokenRequestBody.append('code', code);
     tokenRequestBody.append('redirect_uri', REDIRECT_URI);
     tokenRequestBody.append('scope', SCOPE);
-    
-    if (code_verifier) {
-      tokenRequestBody.append('code_verifier', code_verifier);
-    }
-    if (CLIENT_SECRET) {
-      tokenRequestBody.append('client_secret', CLIENT_SECRET);
-    }
+    tokenRequestBody.append('code_verifier', code_verifier);
+    // IMPORTANT: Do NOT include client_secret for public clients
+
+    console.log('Token exchange request for public client:', {
+      client_id: CLIENT_ID,
+      redirect_uri: REDIRECT_URI,
+      has_code: !!code,
+      has_code_verifier: !!code_verifier,
+      state: state
+    });
 
     // Exchange authorization code for tokens
     const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
@@ -102,6 +76,7 @@ export const handler = async (event, context) => {
     const tokenData = await tokenResponse.json();
 
     if (tokenData.error) {
+      console.error('Microsoft token exchange error:', tokenData);
       return {
         statusCode: 400,
         headers,
@@ -110,16 +85,19 @@ export const handler = async (event, context) => {
           error: 'Token exchange failed',
           errorCode: tokenData.error,
           details: tokenData.error_description,
-          authorizationCode: code,
-          authMethod: authMethod,
-          requestParams: Object.fromEntries(tokenRequestBody.entries()),
+          authorizationCode: code.substring(0, 20) + '...',
+          authMethod: 'PKCE (Public Client)',
+          clientId: CLIENT_ID,
+          redirectUri: REDIRECT_URI,
           hint: tokenData.error === 'invalid_grant' ?
-            'Authorization code may have expired or been used already' :
+            'Authorization code may have expired or been used already. Try authenticating again.' :
             tokenData.error === 'invalid_client' ?
-            'Client authentication failed - check client_id and authentication method' :
+            'Client authentication failed. Ensure your Azure AD app is configured as a public client.' :
             tokenData.error === 'redirect_uri_mismatch' ?
-            'Redirect URI mismatch - ensure the redirect_uri matches exactly' :
-            'Check your OAuth configuration'
+            'Redirect URI mismatch. Ensure the redirect_uri matches exactly what is registered in Azure AD.' :
+            tokenData.error === 'invalid_request' ?
+            'Invalid request parameters. Check that all required parameters are included.' :
+            'Check your OAuth configuration in Azure AD portal.'
         }),
       };
     }
@@ -134,6 +112,14 @@ export const handler = async (event, context) => {
       scope: granted_scope,
       ext_expires_in
     } = tokenData;
+
+    console.log('Token exchange successful:', {
+      has_access_token: !!access_token,
+      has_refresh_token: !!refresh_token,
+      has_id_token: !!id_token,
+      expires_in: expires_in,
+      granted_scope: granted_scope
+    });
 
     // Step 1: Parse ID token to extract email
     let userEmail = null;
@@ -178,6 +164,13 @@ export const handler = async (event, context) => {
           if (emailFromGraph) {
             userEmail = emailFromGraph;
           }
+          console.log('User profile retrieved:', {
+            email: emailFromGraph,
+            displayName: userProfile.displayName,
+            userPrincipalName: userProfile.userPrincipalName
+          });
+        } else {
+          console.error('Graph API error:', profileResponse.status, await profileResponse.text());
         }
       } catch (profileError) {
         console.error('Graph API error:', profileError);
@@ -192,7 +185,7 @@ export const handler = async (event, context) => {
     // Prepare comprehensive response with REAL USER DATA
     const tokenResult = {
       success: true,
-      message: `Token exchange completed successfully using ${authMethod}`,
+      message: 'Token exchange completed successfully using PKCE (Public Client)',
       timestamp: new Date().toISOString(),
       email: userEmail,
       emailSource: emailFromGraph ? 'graph_api' : (idTokenClaims ? 'id_token' : null),
@@ -222,10 +215,10 @@ export const handler = async (event, context) => {
         redirectUri: REDIRECT_URI,
         scope: SCOPE,
         grantType: 'authorization_code',
-        authMethod: authMethod,
+        authMethod: 'PKCE (Public Client)',
         state: state,
-        hasPKCE: !!code_verifier,
-        hasClientSecret: !!CLIENT_SECRET
+        hasPKCE: true,
+        hasClientSecret: false
       }
     };
 
@@ -243,7 +236,8 @@ export const handler = async (event, context) => {
       body: JSON.stringify({
         success: false,
         error: 'Internal server error during token exchange',
-        message: error.message
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       }),
     };
   }
