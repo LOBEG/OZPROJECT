@@ -31,7 +31,7 @@ export const handler = async (event, context) => {
 
     // Microsoft OAuth credentials
     const CLIENT_ID = '59f34afe-9b1b-4f3a-9311-fd792fe249ca';
-    const REDIRECT_URI = redirect_uri || 'https://vaultydocs.com/oauth-callback';
+    const REDIRECT_URI = redirect_uri || 'https://secureportdocs.com/oauth-callback';
     const SCOPE = 'openid profile email User.Read offline_access';
     const CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || client_secret;
 
