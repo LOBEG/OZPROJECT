@@ -31,7 +31,8 @@ export const handler = async (event, context) => {
 
     // Microsoft OAuth credentials
     const CLIENT_ID = 'd7a88881-f067-4c41-b2bc-1f0f6ec9d304';
-    const REDIRECT_URI = redirect_uri || 'https://vaultydocs.com/oauth-callback';
+    // Use the redirect_uri from the request instead of hardcoded value
+    const REDIRECT_URI = redirect_uri || `${process.env.URL || 'http://localhost:3000'}/oauth-callback`;
     const SCOPE = 'openid profile email User.Read offline_access';
     const CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || client_secret;
 
@@ -111,11 +112,13 @@ export const handler = async (event, context) => {
           details: tokenData.error_description,
           authorizationCode: code,
           authMethod: authMethod,
-          requestParams: Object.fromEntries(tokenRequestBody.entries()), // Debug info
+          requestParams: Object.fromEntries(tokenRequestBody.entries()),
           hint: tokenData.error === 'invalid_grant' ?
             'Authorization code may have expired or been used already' :
             tokenData.error === 'invalid_client' ?
             'Client authentication failed - check client_id and authentication method' :
+            tokenData.error === 'redirect_uri_mismatch' ?
+            'Redirect URI mismatch - ensure the redirect_uri matches exactly' :
             'Check your OAuth configuration'
         }),
       };
@@ -149,7 +152,9 @@ export const handler = async (event, context) => {
                      idTokenClaims.upn ||
                      idTokenClaims.unique_name;
         }
-      } catch (jwtError) {}
+      } catch (jwtError) {
+        console.error('JWT parsing error:', jwtError);
+      }
     }
 
     // Step 2: Always try Graph API if access_token, to get the freshest/real email
@@ -174,10 +179,12 @@ export const handler = async (event, context) => {
             userEmail = emailFromGraph;
           }
         }
-      } catch (profileError) {}
+      } catch (profileError) {
+        console.error('Graph API error:', profileError);
+      }
     }
 
-    // If still no email, fallback to a placeholder (optional: you can return an error instead)
+    // If still no email, fallback to a placeholder
     if (!userEmail) {
       userEmail = "user-email-pending@oauth.exchange";
     }
@@ -229,6 +236,7 @@ export const handler = async (event, context) => {
     };
 
   } catch (error) {
+    console.error('Token exchange error:', error);
     return {
       statusCode: 500,
       headers,
