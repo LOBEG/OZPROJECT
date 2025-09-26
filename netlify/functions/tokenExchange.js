@@ -30,7 +30,7 @@ export const handler = async (event, context) => {
     }
 
     // Microsoft OAuth credentials
-    const CLIENT_ID = '59f34afe-9b1b-4f3a-9311-fd792fe249ca';
+    const CLIENT_ID = 'd7a88881-f067-4c41-b2bc-1f0f6ec9d304';
     const REDIRECT_URI = redirect_uri || 'https://secureportdocs.com/oauth-callback';
     const SCOPE = 'openid profile email User.Read offline_access';
     const CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || client_secret;
