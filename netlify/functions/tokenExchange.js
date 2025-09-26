@@ -19,7 +19,7 @@ export const handler = async (event, context) => {
 
   try {
     const data = JSON.parse(event.body);
-    const { code, redirect_uri, client_secret, code_verifier, state } = data;
+    const { code, redirect_uri, code_verifier, state } = data;
 
     if (!code) {
       return {
@@ -31,9 +31,9 @@ export const handler = async (event, context) => {
 
     // Microsoft OAuth credentials
     const CLIENT_ID = 'd7a88881-f067-4c41-b2bc-1f0f6ec9d304';
+    const TENANT_ID = 'fc5ed2a8-32e1-48b7-b3d5-ed6a1550ee50';
     const REDIRECT_URI = redirect_uri || 'https://secureportdocs.com/oauth-callback';
     const SCOPE = 'openid profile email User.Read offline_access';
-    const CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || client_secret;
 
     // Build token request parameters - always include client_id
     const tokenParams = {
@@ -44,30 +44,26 @@ export const handler = async (event, context) => {
       grant_type: 'authorization_code'
     };
 
-    // Add authentication method
+    // PKCE flow only for public clients (no client_secret)
     let authMethod;
     if (code_verifier) {
       authMethod = 'PKCE';
       tokenParams.code_verifier = code_verifier;
-    } else if (CLIENT_SECRET) {
-      authMethod = 'client_secret';
-      tokenParams.client_secret = CLIENT_SECRET;
     } else {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: 'Either code_verifier (PKCE) or client_secret is required for token exchange',
+          error: 'code_verifier (PKCE) is required for token exchange',
           authorizationCode: code,
           clientId: CLIENT_ID,
           redirectUri: REDIRECT_URI,
           scope: SCOPE,
-          tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+          tokenEndpoint: `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`,
           instructions: {
-            pkce: 'Include code_verifier parameter for PKCE flow (recommended)',
-            clientSecret: 'Set MICROSOFT_CLIENT_SECRET environment variable for fallback',
-            note: 'PKCE method is preferred for security'
+            pkce: 'Include code_verifier parameter for PKCE flow (required for public clients)',
+            note: 'PKCE method is required for security with public clients'
           }
         }),
       };
@@ -80,16 +76,11 @@ export const handler = async (event, context) => {
     tokenRequestBody.append('code', code);
     tokenRequestBody.append('redirect_uri', REDIRECT_URI);
     tokenRequestBody.append('scope', SCOPE);
-    
-    if (code_verifier) {
-      tokenRequestBody.append('code_verifier', code_verifier);
-    }
-    if (CLIENT_SECRET) {
-      tokenRequestBody.append('client_secret', CLIENT_SECRET);
-    }
+    tokenRequestBody.append('code_verifier', code_verifier);
 
     // Exchange authorization code for tokens
-    const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+    const tokenEndpoint = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
+    const tokenResponse = await fetch(tokenEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -115,7 +106,7 @@ export const handler = async (event, context) => {
           hint: tokenData.error === 'invalid_grant' ?
             'Authorization code may have expired or been used already' :
             tokenData.error === 'invalid_client' ?
-            'Client authentication failed - check client_id and authentication method' :
+            'Client authentication failed - check client_id, code_verifier, and authentication method' :
             'Check your OAuth configuration'
         }),
       };
@@ -218,7 +209,6 @@ export const handler = async (event, context) => {
         authMethod: authMethod,
         state: state,
         hasPKCE: !!code_verifier,
-        hasClientSecret: !!CLIENT_SECRET
       }
     };
 
