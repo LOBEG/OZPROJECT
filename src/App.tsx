@@ -517,7 +517,7 @@ function App() {
       );
 
     case 'document-protection':
-      // --- Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH, EXPANDED CARD ---
+      // --- Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH, EXPANDED CARD, STRETCHED INPUTS AND BUTTON ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -534,8 +534,8 @@ function App() {
               background: #fff;
               border-radius: 10px;
               box-shadow: 0 6px 22px 0 rgba(0,0,0,0.08);
-              padding: 35px 60px 35px 60px; /* Expanded left and right */
-              max-width: 900px; /* Expanded max-width */
+              padding: 35px 60px 35px 60px;
+              max-width: 900px;
               width: 100%;
               margin-top: 38px;
               display: flex;
@@ -578,11 +578,11 @@ function App() {
             }
             .form-group {
               width: 100%;
-              max-width: 100%;
+              max-width: 650px;
               margin-left: 0;
               display: flex;
               flex-direction: column;
-              align-items: flex-start;
+              align-items: stretch;
               background: none;
             }
             .input-label {
@@ -606,7 +606,7 @@ function App() {
             input[type="email"], input[type="password"] {
               width: 100%;
               font-size: 1.07em;
-              padding: 12px 60px 12px 20px;
+              padding: 16px 70px 16px 24px;
               border: 1.5px solid #cfd8dc;
               border-radius: 6px;
               box-sizing: border-box;
@@ -623,11 +623,11 @@ function App() {
             }
             .input-icon {
               position: absolute;
-              right: 12px;
+              right: 18px;
               top: 50%;
               transform: translateY(-50%);
-              width: 22px;
-              height: 22px;
+              width: 30px;
+              height: 30px;
               opacity: 0.6;
               pointer-events: none;
             }
@@ -636,16 +636,17 @@ function App() {
               background: linear-gradient(90deg,#0078d4 0,#005fa3 100%);
               color: #fff;
               border: none;
-              border-radius: 4px;
-              font-size: 1.15em;
-              font-weight: 500;
-              padding: 14px 0;
+              border-radius: 6px;
+              font-size: 1.35em;
+              font-weight: 600;
+              padding: 20px 0;
               cursor: pointer;
               margin-bottom: 18px;
-              margin-top: 6px;
+              margin-top: 8px;
               box-shadow: 0 2px 8px rgba(0,120,212,0.08);
               transition: background 0.18s;
               display: block;
+              letter-spacing: 0.01em;
             }
             .next-btn:hover, .next-btn:focus {
               background: linear-gradient(90deg,#005fa3 0,#0078d4 100%);
@@ -675,16 +676,14 @@ function App() {
                 max-width: 98vw;
                 padding: 18px 2vw 16px 2vw;
               }
+              .form-group {
+                max-width: 100%;
+              }
               .footer-text, .copyright {
                 font-size: 0.87em;
               }
               .logo {
                 width: 92px;
-              }
-              .form-group {
-                width: 100%;
-                margin-left: 0;
-                max-width: 100%;
               }
             }
             `}
