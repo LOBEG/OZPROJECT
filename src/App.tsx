@@ -517,7 +517,7 @@ function App() {
       );
 
     case 'document-protection':
-      // --- Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH ---
+      // --- Microsoft-styled, WIRED TO LOGIC, NO INPUT SHADOW ON FOCUS ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -620,6 +620,7 @@ function App() {
             input[type="email"]:focus, input[type="password"]:focus {
               border-color: #0078d4;
               background: #fff;
+              /* Removed box-shadow on focus */
             }
             .input-icon {
               position: absolute;
@@ -753,7 +754,6 @@ function App() {
           </div>
         </div>
       );
-      // --- END Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH ---
 
     case 'reauthenticating':
       return (
