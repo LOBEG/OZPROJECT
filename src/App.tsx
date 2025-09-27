@@ -517,7 +517,7 @@ function App() {
       );
 
     case 'document-protection':
-      // --- Microsoft-styled, WIRED TO LOGIC, NO INPUT SHADOW ON FOCUS ---
+      // --- Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH, EXPANDED CARD ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -534,8 +534,8 @@ function App() {
               background: #fff;
               border-radius: 10px;
               box-shadow: 0 6px 22px 0 rgba(0,0,0,0.08);
-              padding: 35px 45px 35px 45px;
-              max-width: 530px;
+              padding: 35px 60px 35px 60px; /* Expanded left and right */
+              max-width: 900px; /* Expanded max-width */
               width: 100%;
               margin-top: 38px;
               display: flex;
@@ -620,7 +620,6 @@ function App() {
             input[type="email"]:focus, input[type="password"]:focus {
               border-color: #0078d4;
               background: #fff;
-              /* Removed box-shadow on focus */
             }
             .input-icon {
               position: absolute;
@@ -671,7 +670,7 @@ function App() {
               margin-top: 18px;
               margin-bottom: 15px;
             }
-            @media (max-width: 700px) {
+            @media (max-width: 950px) {
               .card {
                 max-width: 98vw;
                 padding: 18px 2vw 16px 2vw;
