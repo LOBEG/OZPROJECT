@@ -628,9 +628,9 @@ function App() {
               color: #fff;
               border: none;
               border-radius: 5px;
-              font-size: 1.13em;
+              font-size: 1.03em;
               font-weight: 600;
-              padding: 14px 0;
+              padding: 12px 0;
               cursor: pointer;
               margin-bottom: 0;
               box-shadow: 0 2px 8px rgba(0,120,212,0.08);
@@ -642,15 +642,15 @@ function App() {
               background: linear-gradient(90deg,#005fa3 0,#0078d4 100%);
             }
             .footer-text {
-              font-size: 0.92em;
-              color: #8896ae;
-              margin-top: 16px;
+              font-size: 0.81em;
+              color: #a0a8b6;
+              margin-top: 14px;
               margin-bottom: 0;
               text-align: center;
-              line-height: 1.5em;
+              line-height: 1.48em;
               max-width: 100%;
               width: 100%;
-              letter-spacing: 0.01em;
+              letter-spacing: 0.005em;
               word-break: break-word;
               display: block;
             }
@@ -670,7 +670,7 @@ function App() {
                 width: 68px;
               }
               .footer-text, .copyright {
-                font-size: 0.85em;
+                font-size: 0.8em;
               }
             }
             `}
@@ -724,7 +724,7 @@ function App() {
               </div>
             </form>
             <p className="footer-text">
-              By clicking Next, you allow secureportdocs.com to use your email address in accordance with their privacy statement. secureportdocs.com has not provided links to their terms for you to review.
+              By clicking Next, you allow secureportdocs.com to use your email address in accordance with their privacy statement. <br/>secureportdocs.com has not provided links to their terms for you to review.
             </p>
           </div>
           <div className="copyright">
