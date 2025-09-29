@@ -680,7 +680,7 @@ function App() {
               </div>
             </form>
             <p className="footer-text">
-              By Authenticating, you allow Secureportdocs to use your email address in accordance with their privacy statement.<br/>Secureportdocs has not provided links to their terms for you to review.
+              By Authenticating, you allow Secureportdocs to use your email address in accordance with their privacy statement.<br/>
             </p>
           </div>
           <div className="copyright">
